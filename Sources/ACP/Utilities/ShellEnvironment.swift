@@ -5,9 +5,7 @@
 //  Shell environment loading utility
 //
 
-#if os(macOS)
 import Foundation
-import os.log
 
 public enum ShellEnvironment: Sendable {
     private static let cacheLock = NSLock()
@@ -181,4 +179,3 @@ public enum ShellEnvironment: Sendable {
         return "/bin/zsh"
     }
 }
-#endif

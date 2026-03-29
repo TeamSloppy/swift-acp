@@ -5,7 +5,6 @@
 //  Default terminal delegate implementation
 //
 
-#if os(macOS)
 import Foundation
 import ACPModel
 
@@ -561,4 +560,3 @@ public actor TerminalDelegate {
 
 @available(*, deprecated, renamed: "TerminalDelegate")
 public typealias ACPTerminalDelegate = TerminalDelegate
-#endif

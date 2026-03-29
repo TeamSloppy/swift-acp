@@ -5,10 +5,13 @@
 //  Tracks ACP agent processes across launches for crash recovery cleanup.
 //
 
-#if os(macOS)
 import Foundation
+
+#if canImport(Darwin)
 import Darwin
-import os.log
+#elseif canImport(Glibc)
+import Glibc
+#endif
 
 public actor ProcessRegistry {
     public static let shared = ProcessRegistry()
@@ -206,4 +209,3 @@ public actor ProcessRegistry {
         return errno == EPERM
     }
 }
-#endif

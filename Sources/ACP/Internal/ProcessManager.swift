@@ -5,10 +5,14 @@
 //  Manages subprocess lifecycle, I/O pipes, and message serialization
 //
 
-#if os(macOS)
 import Foundation
+
+#if canImport(Darwin)
 import Darwin
-import os.log
+#elseif canImport(Glibc)
+import Glibc
+#endif
+
 import ACPModel
 
 actor ACPProcessManager {
@@ -465,4 +469,3 @@ actor ACPProcessManager {
         return !proc.isRunning
     }
 }
-#endif

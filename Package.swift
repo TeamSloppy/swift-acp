@@ -15,6 +15,9 @@ let package = Package(
         .library(name: "ACPHTTP", targets: ["ACPHTTP"]),
         .library(name: "ACPRegistry", targets: ["ACPRegistry"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0")
+    ],
     targets: [
         // Core model types (platform-independent)
         .target(
@@ -24,7 +27,10 @@ let package = Package(
         // Main ACP client/agent runtime
         .target(
             name: "ACP",
-            dependencies: ["ACPModel"],
+            dependencies: [
+                "ACPModel",
+                .product(name: "Logging", package: "swift-log")
+            ],
             path: "Sources/ACP"
         ),
         // HTTP/WebSocket transport (optional)

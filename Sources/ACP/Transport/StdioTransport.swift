@@ -2,12 +2,10 @@
 //  StdioTransport.swift
 //  ACP
 //
-//  STDIO-based transport for subprocess communication (macOS only)
+//  STDIO-based transport for subprocess communication
 //
 
-#if os(macOS)
 import Foundation
-import os.log
 import ACPModel
 
 /// Transport implementation using STDIO pipes for subprocess communication.
@@ -318,4 +316,3 @@ public actor StdioTransport: Transport {
         messageContinuation?.finish()
     }
 }
-#endif

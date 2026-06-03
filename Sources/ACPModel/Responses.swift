@@ -71,6 +71,10 @@ public struct NewSessionResponse: Codable, Sendable {
     }
 }
 
+public struct AuthorizationResponse: Codable, Sendable {
+    public init() {}
+}
+
 public struct LoadSessionResponse: Codable, Sendable {
     public let sessionId: SessionId
     public let modes: ModesInfo?
@@ -197,6 +201,24 @@ public struct AuthenticateResponse: Codable, Sendable {
         self.success = success
         self.error = error
         self._meta = _meta
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case error
+        case _meta
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        success = try container.decodeIfPresent(Bool.self, forKey: .success) ?? true
+        error = try container.decodeIfPresent(String.self, forKey: .error)
+        _meta = try container.decodeIfPresent([String: AnyCodable].self, forKey: ._meta)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(_meta, forKey: ._meta)
     }
 }
 

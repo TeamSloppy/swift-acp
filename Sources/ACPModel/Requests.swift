@@ -48,11 +48,16 @@ public struct NewSessionRequest: Codable, Sendable {
         case _meta
     }
 
-    public init(cwd: String, mcpServers: [MCPServerConfig] = [], _meta: [String: AnyCodable]? = nil) {
+    public init(cwd: String, mcpServers: [MCPServerConfig] = [], _meta: [String: AnyCodable]? = nil)
+    {
         self.cwd = cwd
         self.mcpServers = mcpServers
         self._meta = _meta
     }
+}
+
+public struct AuthorizationRequest: Codable, Sendable {
+
 }
 
 public struct LoadSessionRequest: Codable, Sendable {
@@ -198,11 +203,17 @@ public struct SetSessionConfigOptionRequest: Codable, Sendable {
         self._meta = _meta
     }
 
-    public init(sessionId: SessionId, configId: SessionConfigId, value: SessionConfigValueId, _meta: [String: AnyCodable]? = nil) {
+    public init(
+        sessionId: SessionId, configId: SessionConfigId, value: SessionConfigValueId,
+        _meta: [String: AnyCodable]? = nil
+    ) {
         self.init(sessionId: sessionId, configId: configId, value: .select(value), _meta: _meta)
     }
 
-    public init(sessionId: SessionId, configId: SessionConfigId, value: Bool, _meta: [String: AnyCodable]? = nil) {
+    public init(
+        sessionId: SessionId, configId: SessionConfigId, value: Bool,
+        _meta: [String: AnyCodable]? = nil
+    ) {
         self.init(sessionId: sessionId, configId: configId, value: .boolean(value), _meta: _meta)
     }
 
@@ -248,7 +259,9 @@ public struct AuthenticateRequest: Codable, Sendable {
         case _meta
     }
 
-    public init(methodId: String, credentials: [String: String]? = nil, _meta: [String: AnyCodable]? = nil) {
+    public init(
+        methodId: String, credentials: [String: String]? = nil, _meta: [String: AnyCodable]? = nil
+    ) {
         self.methodId = methodId
         self.credentials = credentials
         self._meta = _meta
@@ -268,7 +281,10 @@ public struct ReadTextFileRequest: Codable, Sendable {
         case path, line, limit, sessionId, _meta
     }
 
-    public init(path: String, sessionId: String, line: Int? = nil, limit: Int? = nil, _meta: [String: AnyCodable]? = nil) {
+    public init(
+        path: String, sessionId: String, line: Int? = nil, limit: Int? = nil,
+        _meta: [String: AnyCodable]? = nil
+    ) {
         self.path = path
         self.sessionId = sessionId
         self.line = line
@@ -287,7 +303,9 @@ public struct WriteTextFileRequest: Codable, Sendable {
         case path, content, sessionId, _meta
     }
 
-    public init(path: String, content: String, sessionId: String, _meta: [String: AnyCodable]? = nil) {
+    public init(
+        path: String, content: String, sessionId: String, _meta: [String: AnyCodable]? = nil
+    ) {
         self.path = path
         self.content = content
         self.sessionId = sessionId

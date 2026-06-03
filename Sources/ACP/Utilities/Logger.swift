@@ -9,24 +9,40 @@ import Foundation
 import Logging
 
 public struct Logger: Sendable {
-    private let label: String
+    private let logger: Logging.Logger
 
     public init(subsystem: String, category: String) {
-        self.label = "\(subsystem).\(category)"
+        self.logger = Logging.Logger(label: "\(subsystem).\(category)")
     }
 
-    public func trace(_ message: @autoclosure () -> String) { log(level: .trace, message: message()) }
-    public func debug(_ message: @autoclosure () -> String) { log(level: .debug, message: message()) }
+    public func trace(_ message: @autoclosure () -> String) {
+        log(level: .trace, message: message())
+    }
+    public func debug(_ message: @autoclosure () -> String) {
+        log(level: .debug, message: message())
+    }
     public func info(_ message: @autoclosure () -> String) { log(level: .info, message: message()) }
-    public func notice(_ message: @autoclosure () -> String) { log(level: .notice, message: message()) }
-    public func warning(_ message: @autoclosure () -> String) { log(level: .warning, message: message()) }
-    public func error(_ message: @autoclosure () -> String) { log(level: .error, message: message()) }
-    public func critical(_ message: @autoclosure () -> String) { log(level: .critical, message: message()) }
-    public func fault(_ message: @autoclosure () -> String) { log(level: .critical, message: message()) }
+    public func notice(_ message: @autoclosure () -> String) {
+        log(level: .notice, message: message())
+    }
+    public func warning(_ message: @autoclosure () -> String) {
+        log(level: .warning, message: message())
+    }
+    public func error(_ message: @autoclosure () -> String) {
+        log(level: .error, message: message())
+    }
+    public func critical(_ message: @autoclosure () -> String) {
+        log(level: .critical, message: message())
+    }
+    public func fault(_ message: @autoclosure () -> String) {
+        log(level: .critical, message: message())
+    }
 
     private func log(level: Logging.Logger.Level, message: String) {
-        let handler = StreamLogHandler.standardError(label: label)
-        handler.log(level: level, message: .init(stringLiteral: message), metadata: nil, source: label, file: #fileID, function: #function, line: #line)
+        logger.log(
+            level: level, .init(stringLiteral: message), metadata: nil,
+            file: #fileID, function: #function, line: #line
+        )
     }
 }
 

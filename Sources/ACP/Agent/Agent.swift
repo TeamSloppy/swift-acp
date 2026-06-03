@@ -5,13 +5,19 @@
 //  Agent runtime for building ACP-compliant agents (server mode)
 //
 
-import Foundation
 import ACPModel
+import Foundation
 
 /// Protocol for handling agent operations
 public protocol AgentDelegate: AnyObject, Sendable {
     /// Handle initialization request from client
     func handleInitialize(_ request: InitializeRequest) async throws -> InitializeResponse
+
+    /// Handle authorization request
+    func handleAuthorization(_ request: AuthorizationRequest) async throws -> AuthorizationResponse
+
+    /// Handle authentication request
+    func handleAuthenticate(_ request: AuthenticateRequest) async throws -> AuthenticateResponse
 
     /// Handle new session request
     func handleNewSession(_ request: NewSessionRequest) async throws -> NewSessionResponse
@@ -27,20 +33,39 @@ public protocol AgentDelegate: AnyObject, Sendable {
 
     /// Handle session listing request
     func handleListSessions(_ request: ListSessionsRequest) async throws -> ListSessionsResponse
+
+    /// Handle model selection request
+    func handleSetModel(_ request: SetModelRequest) async throws -> SetModelResponse
 }
 
 /// Default implementations for optional delegate methods
 extension AgentDelegate {
+    public func handleAuthenticate(
+        _ request: AuthenticateRequest
+    ) async throws -> AuthenticateResponse {
+        AuthenticateResponse(success: true)
+    }
+
     public func handleCancel(_ sessionId: SessionId) async throws {
         // Default: no-op
     }
 
-    public func handleLoadSession(_ request: LoadSessionRequest) async throws -> LoadSessionResponse {
+    public func handleLoadSession(
+        _ request: LoadSessionRequest
+    ) async throws -> LoadSessionResponse {
         throw ClientError.invalidResponse
     }
 
-    public func handleListSessions(_ request: ListSessionsRequest) async throws -> ListSessionsResponse {
+    public func handleListSessions(
+        _ request: ListSessionsRequest
+    ) async throws -> ListSessionsResponse {
         throw ClientError.invalidResponse
+    }
+
+    public func handleSetModel(
+        _ request: SetModelRequest
+    ) async throws -> SetModelResponse {
+        SetModelResponse(success: false)
     }
 }
 
@@ -190,6 +215,11 @@ public actor Agent {
             let response = try await delegate.handleInitialize(params)
             return try encodeResult(response)
 
+        case "authenticate":
+            let params = try decodeParams(AuthenticateRequest.self, from: request.params)
+            let response = try await delegate.handleAuthenticate(params)
+            return try encodeResult(response)
+
         case "session/new":
             let params = try decodeParams(NewSessionRequest.self, from: request.params)
             let response = try await delegate.handleNewSession(params)
@@ -210,13 +240,19 @@ public actor Agent {
             let response = try await delegate.handleListSessions(params)
             return try encodeResult(response)
 
+        case "session/set_model":
+            let params = try decodeParams(SetModelRequest.self, from: request.params)
+            let response = try await delegate.handleSetModel(params)
+            return try encodeResult(response)
+
         default:
             // Emit to request stream for custom handling
-            requestContinuation?.yield(AgentRequest(
-                id: request.id,
-                method: request.method,
-                params: request.params
-            ))
+            requestContinuation?.yield(
+                AgentRequest(
+                    id: request.id,
+                    method: request.method,
+                    params: request.params
+                ))
             throw ClientError.invalidResponse
         }
     }
@@ -225,8 +261,9 @@ public actor Agent {
         switch notification.method {
         case "session/cancel":
             if let params = notification.params,
-               let dict = params.value as? [String: Any],
-               let sessionIdValue = dict["sessionId"] as? String {
+                let dict = params.value as? [String: Any],
+                let sessionIdValue = dict["sessionId"] as? String
+            {
                 let sessionId = SessionId(sessionIdValue)
                 try? await delegate?.handleCancel(sessionId)
             }
